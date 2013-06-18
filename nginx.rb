@@ -3,7 +3,7 @@ meta :nginx do
   accepts_list_for :extra_source
 
   def nginx_bin;    nginx_prefix / "sbin/nginx" end
-  def nginx_pid;    nginx_prefix / "run/nginx.pid" end
+  def nginx_pid;    nginx_prefix / 'logs/nginx.pid' end
   def cert_path;    nginx_prefix / "conf/certs" end
   def nginx_conf;   nginx_prefix / "conf/nginx.conf" end
   def vhost_conf;   nginx_prefix / "conf/vhosts/#{domain}.conf" end
@@ -161,7 +161,7 @@ dep 'nginx.src', :nginx_prefix, :version, :upload_module_version do
   end
 
   source "http://nginx.org/download/nginx-#{version}.tar.gz"
-  extra_source "https://github.com/vkholodkov/nginx-upload-module/archive/#{upload_module_version}.zip"
+  # extra_source "https://github.com/vkholodkov/nginx-upload-module/archive/#{upload_module_version}.zip"
 
   configure_args L{
     [
@@ -169,7 +169,7 @@ dep 'nginx.src', :nginx_prefix, :version, :upload_module_version do
       "--with-pcre",
       "--with-http_ssl_module",
       "--with-http_gzip_static_module",
-      "--add-module='../../#{upload_module_version}/nginx-upload-module-#{upload_module_version}'",
+      # "--add-module='../../#{upload_module_version}/nginx-upload-module-#{upload_module_version}'",
       "--with-ld-opt='#{shell('pcre-config --libs')}'"
     ].join(' ')
   }
