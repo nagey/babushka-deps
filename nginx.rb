@@ -61,7 +61,7 @@ dep 'vhost configured.nginx', :vhost_type, :domain, :domain_aliases, :path, :lis
     ).uniq
   end
 
-  vhost_type.default('unicorn').choose(%w[unicorn proxy static])
+  vhost_type.default('unicorn').choose(%w[unicorn proxy static websocket_proxy])
   path.default("~#{domain}/current".p) if shell?('id', domain)
 
   requires 'configured.nginx'.with(nginx_prefix)
@@ -152,7 +152,7 @@ end
 
 dep 'nginx.src', :nginx_prefix, :version, :upload_module_version do
   nginx_prefix.default!("/opt/nginx")
-  version.default!('1.2.7')
+  version.default!('1.4.1')
   upload_module_version.default!('2.2')
 
   requires 'pcre.managed', 'libssl headers.managed', 'zlib headers.managed'
