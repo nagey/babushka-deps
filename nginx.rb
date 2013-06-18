@@ -3,7 +3,7 @@ meta :nginx do
   accepts_list_for :extra_source
 
   def nginx_bin;    nginx_prefix / "sbin/nginx" end
-  def nginx_pid;    nginx_prefix / "run/nginx.pid" end
+  def nginx_pid;    nginx_prefix / 'logs/nginx.pid' end
   def cert_path;    nginx_prefix / "conf/certs" end
   def nginx_conf;   nginx_prefix / "conf/nginx.conf" end
   def vhost_conf;   nginx_prefix / "conf/vhosts/#{domain}.conf" end
@@ -152,16 +152,16 @@ end
 
 dep 'nginx.src', :nginx_prefix, :version, :upload_module_version do
   nginx_prefix.default!("/opt/nginx")
-  version.default!('1.2.4')
+  version.default!('1.2.7')
   upload_module_version.default!('2.2')
 
   requires 'pcre.managed', 'libssl headers.managed', 'zlib headers.managed'
-  on :linux do 
+  on :linux do
     requires "unzip.managed"
   end
 
   source "http://nginx.org/download/nginx-#{version}.tar.gz"
-  extra_source "https://github.com/vkholodkov/nginx-upload-module/archive/#{upload_module_version}.zip"
+  # extra_source "https://github.com/vkholodkov/nginx-upload-module/archive/#{upload_module_version}.zip"
 
   configure_args L{
     [
@@ -169,7 +169,7 @@ dep 'nginx.src', :nginx_prefix, :version, :upload_module_version do
       "--with-pcre",
       "--with-http_ssl_module",
       "--with-http_gzip_static_module",
-      "--add-module='../../#{upload_module_version}/nginx-upload-module-#{upload_module_version}'",
+      # "--add-module='../../#{upload_module_version}/nginx-upload-module-#{upload_module_version}'",
       "--with-ld-opt='#{shell('pcre-config --libs')}'"
     ].join(' ')
   }
@@ -197,7 +197,7 @@ dep 'http basic logins.nginx', :nginx_prefix, :domain, :username, :pass do
   nginx_prefix.default!('/opt/nginx')
   requires 'http basic auth enabled.nginx'.with(nginx_prefix, domain)
   met? { shell("curl -I -u #{username}:#{pass} #{domain}").val_for('HTTP/1.1')[/^[25]0\d\b/] }
-  meet { append_to_file "#{username}:#{pass.to_s.crypt(pass)}", (nginx_prefix / 'conf/htpasswd'), :sudo => true }
+  meet { (nginx_prefix / 'conf/htpasswd').append("#{username}:#{pass.to_s.crypt(pass)}") }
   after { restart_nginx }
 end
 
@@ -205,7 +205,7 @@ dep 'http basic auth enabled.nginx', :nginx_prefix, :domain do
   requires 'configured.nginx'.with(nginx_prefix)
   met? { shell("curl -I #{domain}").val_for('HTTP/1.1')[/^401\b/] }
   meet {
-    append_to_file %Q{auth_basic 'Restricted';\nauth_basic_user_file htpasswd;}, vhost_common, :sudo => true
+    vhost_common.p.append(%Q{auth_basic 'Restricted';\nauth_basic_user_file htpasswd;})
   }
   after {
     sudo "touch #{nginx_prefix / 'conf/htpasswd'}"

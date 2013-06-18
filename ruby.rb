@@ -1,5 +1,5 @@
 dep 'ruby trunk.src' do
-  requires 'build tools', 'bison.managed', 'readline headers.managed'
+  requires_when_unmet 'build tools', 'bison.managed', 'readline headers.managed'
   source 'git://github.com/ruby/ruby.git'
   provides 'ruby == 1.9.3.dev', 'gem', 'irb'
   configure_args '--disable-install-doc', '--with-readline-dir=/usr'
@@ -10,8 +10,8 @@ dep 'ruby.src', :version, :patchlevel do
     version.to_s.scan(/^\d\.\d/).first
   end
   version.default!('1.9.3')
-  patchlevel.default!('p194')
-  requires [
+  patchlevel.default!('p374')
+  requires_when_unmet [
     'curl.lib',
     'libssl headers.managed',
     'readline headers.managed',
@@ -23,6 +23,9 @@ dep 'ruby.src', :version, :patchlevel do
   configure_args '--disable-install-doc',
     "--with-readline-dir=#{Babushka.host.pkg_helper.prefix}",
     "--with-libyaml-dir=#{Babushka.host.pkg_helper.prefix}"
+  build {
+    log_shell "build", "make -j#{Babushka.host.cpus}"
+  }
   postinstall {
     # The ruby <1.9.3 installer skips bin/* when the build path contains a dot-dir.
     shell "cp bin/* #{prefix / 'bin'}", :sudo => Babushka::SrcHelper.should_sudo?
