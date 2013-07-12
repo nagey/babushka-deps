@@ -167,7 +167,7 @@ dep 'nginx.src', :nginx_prefix, :version, :upload_module_version, :ngx_pagespeed
   extra_source "https://dl.google.com/dl/page-speed/psol/#{psol_version}.tar.gz"
   # extra_source "https://github.com/vkholodkov/nginx-upload-module/archive/#{upload_module_version}.zip"
 
-  shell "mv -v ../../psol ../../ngx_pagespeed-#{ngx_pagespeed_version}/"
+  shell "mv -v ../../#{psol_version}/psol ../../#{ngx_pagespeed_version}/ngx_pagespeed-#{ngx_pagespeed_version}/"
 
   configure_args L{
     [
@@ -176,7 +176,7 @@ dep 'nginx.src', :nginx_prefix, :version, :upload_module_version, :ngx_pagespeed
       "--with-http_ssl_module",
       "--with-http_gzip_static_module",
       # "--add-module='../../#{upload_module_version}/nginx-upload-module-#{upload_module_version}'",
-      "--add-module=../../ngx_pagespeed-#{ngx_pagespeed_version}",
+      "--add-module=../../#{ngx_pagespeed_version}/ngx_pagespeed-#{ngx_pagespeed_version}",
       "--with-ld-opt='#{shell('pcre-config --libs')}'"
     ].join(' ')
   }
