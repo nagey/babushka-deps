@@ -154,6 +154,8 @@ dep 'nginx.src', :nginx_prefix, :version, :upload_module_version do
   nginx_prefix.default!("/opt/nginx")
   version.default!('1.4.1')
   upload_module_version.default!('2.2')
+  ngx_pagespeed_version.default!('release-1.6.29.3-beta');
+  psol_version.default!('1.6.29.3');
 
   requires 'pcre.managed', 'libssl headers.managed', 'zlib headers.managed'
   on :linux do
@@ -161,7 +163,11 @@ dep 'nginx.src', :nginx_prefix, :version, :upload_module_version do
   end
 
   source "http://nginx.org/download/nginx-#{version}.tar.gz"
+  extra_source "https://github.com/pagespeed/ngx_pagespeed/archive/#{ngx_pagespeed_version}.zip"
+  extra_source "https://dl.google.com/dl/page-speed/psol/#{psol_version}.tar.gz"
   # extra_source "https://github.com/vkholodkov/nginx-upload-module/archive/#{upload_module_version}.zip"
+
+  shell "mv -v ../../psol ../../ngx_pagespeed-#{ngx_pagespeed_version}/"
 
   configure_args L{
     [
@@ -170,6 +176,7 @@ dep 'nginx.src', :nginx_prefix, :version, :upload_module_version do
       "--with-http_ssl_module",
       "--with-http_gzip_static_module",
       # "--add-module='../../#{upload_module_version}/nginx-upload-module-#{upload_module_version}'",
+      "--add-module=../../ngx_pagespeed-#{ngx_pagespeed_version}",
       "--with-ld-opt='#{shell('pcre-config --libs')}'"
     ].join(' ')
   }
