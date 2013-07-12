@@ -150,7 +150,7 @@ dep 'configured.nginx', :nginx_prefix do
   }
 end
 
-dep 'nginx.src', :nginx_prefix, :version, :upload_module_version do
+dep 'nginx.src', :nginx_prefix, :version, :upload_module_version, :ngx_pagespeed_version, :psol_version do
   nginx_prefix.default!("/opt/nginx")
   version.default!('1.4.1')
   upload_module_version.default!('2.2')
