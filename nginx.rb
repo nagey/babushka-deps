@@ -167,8 +167,6 @@ dep 'nginx.src', :nginx_prefix, :version, :upload_module_version, :ngx_pagespeed
   extra_source "https://dl.google.com/dl/page-speed/psol/#{psol_version}.tar.gz"
   # extra_source "https://github.com/vkholodkov/nginx-upload-module/archive/#{upload_module_version}.zip"
 
-  shell "mv -v ../../#{psol_version}/psol ../../#{ngx_pagespeed_version}/ngx_pagespeed-#{ngx_pagespeed_version}/"
-
   configure_args L{
     [
       "--with-ipv6",
@@ -184,7 +182,10 @@ dep 'nginx.src', :nginx_prefix, :version, :upload_module_version, :ngx_pagespeed
   prefix nginx_prefix
   provides nginx_prefix / 'sbin/nginx'
 
-  configure { log_shell "configure", default_configure_command }
+  configure { 
+    log_shell "Put pagespeed in place", "mv -v ../../#{psol_version}/psol ../../#{ngx_pagespeed_version}/ngx_pagespeed-#{ngx_pagespeed_version}/"
+    log_shell "configure", default_configure_command 
+  }
   build { log_shell "build", "make" }
   install { log_shell "install", "make install", :sudo => true }
 
