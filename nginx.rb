@@ -163,20 +163,20 @@ dep 'nginx.src', :nginx_prefix, :version, :upload_module_version, :ngx_pagespeed
   end
 
   source "http://nginx.org/download/nginx-#{version}.tar.gz"
-  extra_source "https://github.com/pagespeed/ngx_pagespeed/archive/#{ngx_pagespeed_version}.zip"
-  extra_source "https://dl.google.com/dl/page-speed/psol/#{psol_version}.tar.gz"
+  extra_source "https://github.com/pagespeed/ngx_pagespeed/archive/#{ngx_pagespeed_version}.zip" if Babushka::host.linux?
+  extra_source "https://dl.google.com/dl/page-speed/psol/#{psol_version}.tar.gz" if Babushka::host.linux?
   # extra_source "https://github.com/vkholodkov/nginx-upload-module/archive/#{upload_module_version}.zip"
 
   configure_args L{
-    [
+    args = [
       "--with-ipv6",
       "--with-pcre",
       "--with-http_ssl_module",
       "--with-http_gzip_static_module",
-      # "--add-module='../../#{upload_module_version}/nginx-upload-module-#{upload_module_version}'",
-      "--add-module=../../#{ngx_pagespeed_version}/ngx_pagespeed-#{ngx_pagespeed_version}",
       "--with-ld-opt='#{shell('pcre-config --libs')}'"
-    ].join(' ')
+    ]
+    args.push("--add-module=../../#{ngx_pagespeed_version}/ngx_pagespeed-#{ngx_pagespeed_version}") if Babushka::host.linux?
+    args.join(" ")
   }
 
   prefix nginx_prefix
